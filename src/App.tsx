@@ -1,20 +1,18 @@
-import React from "react";
-import { Button } from "@material-ui/core";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import "./App.css";
+import React from 'react'
+import Home from './pages/Home'
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
+import './App.css'
 
 class App extends React.Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <Button variant="contained" color="primary">
-          Hello World
-        </Button>
-      </ThemeProvider>
-    );
-  }
+    render() {
+        return (
+            <ThemeProvider theme={theme}>
+                <Home />
+            </ThemeProvider>
+        )
+    }
 }
 
-const theme = createMuiTheme({});
+const theme = createMuiTheme({})
 
-export default App;
+export default App
