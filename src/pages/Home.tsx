@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
 type State = {
     loading: boolean
     widgets: string[]
+    filteredWidgets: string[]
 }
 
 export default function Home() {
@@ -25,11 +26,25 @@ export default function Home() {
     const [state, setState] = React.useState<State>({
         loading: true,
         widgets: [],
+        filteredWidgets: [],
     })
+
+    const filterWidgets = (word: string) =>
+        setState({
+            ...state,
+            filteredWidgets: state.widgets.filter(widget =>
+                widget.toLowerCase().includes(word.toLowerCase())
+            ),
+        })
 
     const loadWidgets = async () => {
         let widgets = await ApiWrapper.getWidgets()
-        setState({ ...state, loading: false, widgets })
+        setState({
+            ...state,
+            loading: false,
+            widgets,
+            filteredWidgets: widgets,
+        })
     }
 
     useEffect(() => {
@@ -38,12 +53,12 @@ export default function Home() {
 
     return (
         <div>
-            <TopBar />
+            <TopBar onSearchTextChange={filterWidgets} />
             <div className={classes.content}>
                 {state.loading ? (
                     <LinearProgress />
                 ) : (
-                    <WidgetsGrid widgets={state.widgets} />
+                    <WidgetsGrid widgets={state.filteredWidgets} />
                 )}
             </div>
         </div>

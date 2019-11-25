@@ -51,7 +51,7 @@ type Props = {
 type State = {
     loading: boolean
     enabled: boolean
-    mode?: string
+    mode: string
     availableModes: string[]
 }
 
@@ -61,7 +61,7 @@ export default function Widget(props: Props) {
     const [state, setState] = React.useState<State>({
         loading: true,
         enabled: false,
-        mode: undefined,
+        mode: '',
         availableModes: [],
     })
 
@@ -72,11 +72,16 @@ export default function Widget(props: Props) {
         await setState({
             ...state,
             enabled: status.status === WidgetStatus.Enabled,
-            mode: status.mode,
+            mode: status.mode || '',
             availableModes: status.availableModes || [],
             loading: false,
         })
         console.log(state.enabled)
+    }
+
+    const updateWidget = async () => {
+        await ApiWrapper.setWidgetEnable(props.name, state.enabled)
+        await ApiWrapper.setWidgetMode(props.name, state.mode)
     }
 
     const handleEnabledChange = (name: string) => (

@@ -63,7 +63,11 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 )
 
-export default function SearchAppBar() {
+type Props = {
+    onSearchTextChange: (word: string) => any
+}
+
+export default function SearchAppBar(props: Props) {
     const classes = useStyles()
 
     return (
@@ -91,6 +95,9 @@ export default function SearchAppBar() {
                                 root: classes.inputRoot,
                                 input: classes.inputInput,
                             }}
+                            onChange={event =>
+                                props.onSearchTextChange(event.target.value)
+                            }
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </div>

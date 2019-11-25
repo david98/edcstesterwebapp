@@ -43,6 +43,23 @@ class ApiWrapper {
             }
         }
     }
+
+    setWidgetEnable: (
+        widgetName: string,
+        enabled: boolean
+    ) => Promise<void> = async (widgetName: string, enabled: boolean) => {
+        let requestURL =
+            ApiBaseUrl + widgetName + '/' + (enabled ? 'enable' : 'disable')
+        await fetch(requestURL, { method: 'POST' })
+    }
+
+    setWidgetMode: (widgetName: string, mode: string) => Promise<void> = async (
+        widgetName: string,
+        mode: string
+    ) => {
+        let requestURL = ApiBaseUrl + 'mode/' + widgetName + '/' + mode
+        await fetch(requestURL, { method: 'POST' })
+    }
 }
 
 export default new ApiWrapper()
