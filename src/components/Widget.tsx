@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper'
 import FormControl from '@material-ui/core/FormControl'
 import { createStyles, makeStyles, Theme } from '@material-ui/core'
 import Container from '@material-ui/core/Container'
-import LinearProgress from '@material-ui/core/LinearProgress'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import ApiWrapper, {
     WidgetStatus,
@@ -76,12 +76,13 @@ export default function Widget(props: Props) {
             availableModes: status.availableModes || [],
             loading: false,
         })
-        console.log(state.enabled)
     }
 
     const updateWidget = async () => {
-        await ApiWrapper.setWidgetEnable(props.name, state.enabled)
-        await ApiWrapper.setWidgetMode(props.name, state.mode)
+        if (!state.loading) {
+            await ApiWrapper.setWidgetEnable(props.name, state.enabled)
+            await ApiWrapper.setWidgetMode(props.name, state.mode)
+        }
     }
 
     const handleEnabledChange = (name: string) => (
@@ -106,12 +107,14 @@ export default function Widget(props: Props) {
         loadStatus()
     }, [])
 
-    useEffect(() => {}, [state.enabled, state.mode])
+    useEffect(() => {
+        updateWidget()
+    }, [state.enabled, state.mode])
 
     return (
         <Paper className={classes.paper}>
             {state.loading ? (
-                <LinearProgress />
+                <CircularProgress />
             ) : (
                 <Container maxWidth={'sm'}>
                     <div className={classes.titleContainer}>

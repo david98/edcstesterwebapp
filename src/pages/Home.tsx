@@ -11,6 +11,9 @@ const useStyles = makeStyles((theme: Theme) =>
         content: {
             padding: 50,
         },
+        root: {
+            flexGrow: 1,
+        },
     })
 )
 
@@ -52,7 +55,7 @@ export default function Home() {
     }, [])
 
     return (
-        <div>
+        <div className={classes.root}>
             <TopBar onSearchTextChange={filterWidgets} />
             <div className={classes.content}>
                 {state.loading ? (
