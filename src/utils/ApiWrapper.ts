@@ -1,19 +1,30 @@
-export const ApiBaseUrl: string = 'http://edcstester.com/api/'
+export const ApiBaseUrl: string = 'http://edcstester.com/api/v1/'
 
 export enum WidgetStatus {
     Enabled = 'enabled',
     Disabled = 'disabled',
 }
 
-export type WidgetStatusResponse = {
-    status?: WidgetStatus
-    error?: string
-    mode?: string
-    availableModes?: string[]
+export type WidgetsListResponse = {
+    widgets: string[]
 }
 
-export type AllWidgetsResponse = {
-    widgets: string[]
+export type WidgetStatusResponse = {
+    enabled: boolean
+    currentMode: string
+    availableModes: string[]
+}
+
+export type WidgetToggleResponse = {
+    enabled: boolean
+}
+
+export type WidgetModeResponse = {
+    currentMode: string
+}
+
+export type ErrorResponse = {
+    error: string
 }
 
 class ApiWrapper {
@@ -22,56 +33,82 @@ class ApiWrapper {
 
         try {
             let response = await fetch(requestURL, { mode: 'cors' })
-            let responseJson: AllWidgetsResponse = await response.json()
+            let responseJson: WidgetsListResponse = await response.json()
 
-            return responseJson.widgets || []
+            return responseJson.widgets
         } catch (e) {
             console.log(e)
-            return []
+            throw e
         }
     }
 
     getWidgetStatus: (
         widgetName: string
     ) => Promise<WidgetStatusResponse> = async (widgetName: string) => {
-        let requestURL = ApiBaseUrl + widgetName + '/status'
+        let requestURL = ApiBaseUrl + 'widgets/' + widgetName
         try {
             let response = await fetch(requestURL, { mode: 'cors' })
             let responseJson = await response.json()
 
-            if (responseJson) {
-                responseJson['status'] =
-                    responseJson['status'] === 'enabled'
-                        ? WidgetStatus.Enabled
-                        : WidgetStatus.Disabled
-                return responseJson as Promise<WidgetStatusResponse>
-            } else
-                return {
-                    error: 'Unknown error',
-                }
+            return responseJson as WidgetStatusResponse
         } catch (error) {
             console.log(error)
-            return {
-                error: error,
-            }
+            throw error
         }
     }
 
     setWidgetEnable: (
         widgetName: string,
         enabled: boolean
-    ) => Promise<void> = async (widgetName: string, enabled: boolean) => {
-        let requestURL =
-            ApiBaseUrl + widgetName + '/' + (enabled ? 'enable' : 'disable')
-        await fetch(requestURL, { method: 'POST', mode: 'cors' })
+    ) => Promise<WidgetToggleResponse | ErrorResponse> = async (
+        widgetName: string,
+        enabled: boolean
+    ) => {
+        try {
+            let requestURL =
+                ApiBaseUrl +
+                'widgets/' +
+                widgetName +
+                '/' +
+                (enabled ? 'enable' : 'disable')
+            let response = await fetch(requestURL, {
+                method: 'POST',
+                mode: 'cors',
+            })
+            let responseJson = await response.json()
+
+            if (responseJson.enabled !== enabled) {
+                throw new Error('Widget toggle fail!')
+            } else if (response.status !== 200) {
+                return responseJson as ErrorResponse
+            } else {
+                return responseJson as WidgetToggleResponse
+            }
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 
     setWidgetMode: (widgetName: string, mode: string) => Promise<void> = async (
         widgetName: string,
         mode: string
     ) => {
-        let requestURL = ApiBaseUrl + widgetName + '/mode/' + mode
-        await fetch(requestURL, { method: 'POST', mode: 'cors' })
+        try {
+            let requestURL = ApiBaseUrl + 'widgets/' + widgetName + '/mode'
+            await fetch(requestURL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ newMode: mode }),
+            })
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 }
 

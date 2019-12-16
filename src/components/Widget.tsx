@@ -9,10 +9,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core'
 import Container from '@material-ui/core/Container'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
-import ApiWrapper, {
-    WidgetStatus,
-    WidgetStatusResponse,
-} from '../utils/ApiWrapper'
+import ApiWrapper, { WidgetStatusResponse } from '../utils/ApiWrapper'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -71,8 +68,8 @@ export default function Widget(props: Props) {
         )
         await setState({
             ...state,
-            enabled: status.status === WidgetStatus.Enabled,
-            mode: status.mode || '',
+            enabled: status.enabled,
+            mode: status.currentMode || '',
             availableModes: status.availableModes || [],
             loading: false,
         })
