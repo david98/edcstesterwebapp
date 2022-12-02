@@ -1,45 +1,49 @@
 import React from 'react'
 import Home from './pages/Home'
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
-import blue from '@material-ui/core/colors/blue'
-import { CssBaseline } from '@material-ui/core'
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import './App.css'
 
-import { ApiBaseUrl } from './utils/ApiWrapper'
-
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import SwaggerUI from 'swagger-ui-react'
 import 'swagger-ui-react/swagger-ui.css'
+import { ApiBaseUrl } from './utils/ApiWrapper'
 
-const theme = createMuiTheme({
+const darkTheme = createTheme({
     palette: {
-        primary: blue,
-        type: 'dark',
+        mode: 'dark',
     },
 })
 
-class App extends React.Component {
-    render() {
-        return (
+export function App() {
+    console.log(SwaggerUI)
+    return (
+        <ThemeProvider theme={darkTheme}>
             <Router>
-                <Switch>
-                    <Route path="/apidocs">
-                        <SwaggerUI
-                            docExpansion="list"
-                            url={ApiBaseUrl + 'swagger.json'}
-                        />
-                    </Route>
-                    <Route path="/">
-                        <ThemeProvider theme={theme}>
-                            <CssBaseline />
-                            <Home />
-                        </ThemeProvider>
-                    </Route>
-                </Switch>
+                <Routes>
+                    <Route
+                        path="/apidocs"
+                        element={
+                            // @ts-ignore
+                            <SwaggerUI
+                                docExpansion="list"
+                                url={ApiBaseUrl + 'swagger.json'}
+                            />
+                        }
+                    ></Route>
+                    <Route
+                        path="/"
+                        element={
+                            <>
+                                <CssBaseline />
+                                <Home />
+                            </>
+                        }
+                    />
+                </Routes>
             </Router>
-        )
-    }
+        </ThemeProvider>
+    )
 }
 
 export default App

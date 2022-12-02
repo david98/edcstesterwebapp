@@ -1,45 +1,7 @@
 import React, { useEffect } from 'react'
-import Switch from '@material-ui/core/Switch'
-import InputLabel from '@material-ui/core/InputLabel'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import Paper from '@material-ui/core/Paper'
-import FormControl from '@material-ui/core/FormControl'
-import { createStyles, makeStyles, Theme } from '@material-ui/core'
-import Container from '@material-ui/core/Container'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import {Switch, InputLabel, Select, MenuItem, Paper, FormControl, createStyles, makeStyles, Theme, Container, CircularProgress} from '@mui/material'
 
 import ApiWrapper, { WidgetStatusResponse } from '../utils/ApiWrapper'
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-        paper: {
-            padding: theme.spacing(2),
-            textAlign: 'center',
-            color: theme.palette.text.secondary,
-        },
-        titleContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-        },
-        title: {
-            justifySelf: 'left',
-        },
-        switch: {
-            justifySelf: 'right',
-            marginLeft: 'auto',
-        },
-        selectEmpty: {
-            marginTop: theme.spacing(2),
-        },
-    })
-)
 
 type Props = {
     name: string
@@ -53,7 +15,6 @@ type State = {
 }
 
 export default function Widget(props: Props) {
-    const classes = useStyles()
 
     const [state, setState] = React.useState<State>({
         loading: true,
@@ -97,9 +58,6 @@ export default function Widget(props: Props) {
         })
     }
 
-    const inputLabel = React.useRef<HTMLLabelElement>(null)
-    const [labelWidth, setLabelWidth] = React.useState(0)
-
     useEffect(() => {
         loadStatus()
     }, [])
@@ -109,17 +67,16 @@ export default function Widget(props: Props) {
     }, [state.enabled, state.mode])
 
     return (
-        <Paper className={classes.paper}>
+        <Paper >
             {state.loading ? (
                 <CircularProgress />
             ) : (
                 <Container maxWidth={'sm'}>
-                    <div className={classes.titleContainer}>
-                        <h2 className={classes.title}>{props.name}</h2>
-                        <FormControl className={classes.formControl}>
+                    <div >
+                        <h2>{props.name}</h2>
+                        <FormControl>
                             <Switch
                                 id={props.name + '-enable'}
-                                className={classes.switch}
                                 checked={state.enabled}
                                 onChange={handleEnabledChange('enabled')}
                                 value="enabled"
@@ -130,7 +87,7 @@ export default function Widget(props: Props) {
                             />
                         </FormControl>
                     </div>
-                    <FormControl className={classes.formControl}>
+                    <FormControl >
                         <InputLabel
                             id={props.name + '-mode-label'}
                             htmlFor={props.name + '-mode'}
@@ -140,7 +97,7 @@ export default function Widget(props: Props) {
                         <Select
                             labelId={props.name + '-mode-label'}
                             value={state.mode}
-                            onChange={handleModeChange('mode')}
+                            // onChange={handleModeChange('mode')}
                             inputProps={{
                                 name: 'mode',
                                 id: props.name + '-mode',

@@ -2,20 +2,8 @@ import React, { useEffect } from 'react'
 
 import TopBar from '../components/TopBar'
 import WidgetsGrid from '../components/WidgetsGrid'
-import { createStyles, makeStyles, Theme } from '@material-ui/core'
-import LinearProgress from '@material-ui/core/LinearProgress'
+import { createStyles, makeStyles, Theme, LinearProgress } from '@mui/material'
 import ApiWrapper from '../utils/ApiWrapper'
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        content: {
-            padding: 50,
-        },
-        root: {
-            flexGrow: 1,
-        },
-    })
-)
 
 type State = {
     loading: boolean
@@ -24,7 +12,6 @@ type State = {
 }
 
 export default function Home() {
-    const classes = useStyles()
 
     const [state, setState] = React.useState<State>({
         loading: true,
@@ -55,9 +42,9 @@ export default function Home() {
     }, [])
 
     return (
-        <div className={classes.root}>
+        <div>
             <TopBar onSearchTextChange={filterWidgets} />
-            <div className={classes.content}>
+            <div>
                 {state.loading ? (
                     <LinearProgress />
                 ) : (
