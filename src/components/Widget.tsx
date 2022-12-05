@@ -1,5 +1,16 @@
-import React, { useEffect } from 'react'
-import {Switch, InputLabel, Select, MenuItem, Paper, FormControl, createStyles, makeStyles, Theme, Container, CircularProgress} from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import {
+    Card,
+    CardContent,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Stack,
+    Switch,
+    Typography,
+} from '@mui/material'
 
 import ApiWrapper, { WidgetStatusResponse } from '../utils/ApiWrapper'
 
@@ -7,87 +18,75 @@ type Props = {
     name: string
 }
 
-type State = {
-    loading: boolean
-    enabled: boolean
-    mode: string
-    availableModes: string[]
-}
-
 export default function Widget(props: Props) {
+    const [loading, setLoading] = useState(true)
+    const [enabled, setEnabled] = useState(false)
+    const [mode, setMode] = useState('')
+    const [availableModes, setAvailableModes] = useState<string[]>([])
 
-    const [state, setState] = React.useState<State>({
-        loading: true,
-        enabled: false,
-        mode: '',
-        availableModes: [],
-    })
-
-    const loadStatus = async () => {
-        let status: WidgetStatusResponse = await ApiWrapper.getWidgetStatus(
-            props.name
-        )
-        await setState({
-            ...state,
-            enabled: status.enabled,
-            mode: status.currentMode || '',
-            availableModes: status.availableModes || [],
-            loading: false,
-        })
-    }
-
-    const updateWidget = async () => {
-        if (!state.loading) {
-            await ApiWrapper.setWidgetEnable(props.name, state.enabled)
-            await ApiWrapper.setWidgetMode(props.name, state.mode)
-        }
-    }
-
-    const handleEnabledChange = (name: string) => (
+    const handleEnabledChange = (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
-        setState({ ...state, [name]: event.target.checked })
+        setEnabled(event.target.checked)
     }
 
-    const handleModeChange = (name: keyof typeof state) => (
-        event: React.ChangeEvent<{ value: unknown }>
-    ) => {
-        setState({
-            ...state,
-            [name]: event.target.value,
-        })
+    const handleModeChange = (event: SelectChangeEvent<string>) => {
+        setMode(event.target.value)
     }
 
     useEffect(() => {
+        const loadStatus = async () => {
+            let status: WidgetStatusResponse = await ApiWrapper.getWidgetStatus(
+                props.name
+            )
+            await setEnabled(status.enabled)
+            await setMode(status.currentMode || '')
+            await setAvailableModes(status.availableModes || [])
+            await setLoading(false)
+        }
         loadStatus()
-    }, [])
+    }, [props.name])
 
     useEffect(() => {
+        const updateWidget = async () => {
+            if (!loading) {
+                await ApiWrapper.setWidgetEnable(props.name, enabled)
+                await ApiWrapper.setWidgetMode(props.name, mode)
+            }
+        }
         updateWidget()
-    }, [state.enabled, state.mode])
+    }, [mode, loading, props.name, enabled])
 
     return (
-        <Paper >
-            {state.loading ? (
-                <CircularProgress />
-            ) : (
-                <Container maxWidth={'sm'}>
-                    <div >
-                        <h2>{props.name}</h2>
-                        <FormControl>
-                            <Switch
-                                id={props.name + '-enable'}
-                                checked={state.enabled}
-                                onChange={handleEnabledChange('enabled')}
-                                value="enabled"
-                                color="primary"
-                                inputProps={{
-                                    'aria-label': 'primary checkbox',
-                                }}
-                            />
-                        </FormControl>
-                    </div>
-                    <FormControl >
+        <Card
+            sx={{
+                width: 400,
+                height: 250,
+                paddingLeft: 5,
+                paddingRight: 5,
+                paddingTop: 2,
+                paddingBottom: 2,
+            }}
+        >
+            <CardContent>
+                <Stack spacing={2}>
+                    <Stack direction="row" sx={{ width: '100%' }}>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {props.name}
+                        </Typography>
+                        <Switch
+                            sx={{ marginLeft: 'auto' }}
+                            id={props.name + '-enable'}
+                            checked={enabled}
+                            onChange={handleEnabledChange}
+                            color="primary"
+                            inputProps={{
+                                'aria-label': 'primary checkbox',
+                            }}
+                        />
+                    </Stack>
+
+                    <FormControl>
                         <InputLabel
                             id={props.name + '-mode-label'}
                             htmlFor={props.name + '-mode'}
@@ -96,14 +95,14 @@ export default function Widget(props: Props) {
                         </InputLabel>
                         <Select
                             labelId={props.name + '-mode-label'}
-                            value={state.mode}
-                            // onChange={handleModeChange('mode')}
+                            value={mode}
+                            onChange={handleModeChange}
                             inputProps={{
                                 name: 'mode',
                                 id: props.name + '-mode',
                             }}
                         >
-                            {state.availableModes.map(modeName => (
+                            {availableModes.map((modeName) => (
                                 <MenuItem
                                     key={props.name + modeName}
                                     value={modeName}
@@ -113,8 +112,8 @@ export default function Widget(props: Props) {
                             ))}
                         </Select>
                     </FormControl>
-                </Container>
-            )}{' '}
-        </Paper>
+                </Stack>
+            </CardContent>
+        </Card>
     )
 }

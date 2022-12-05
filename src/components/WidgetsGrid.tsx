@@ -1,5 +1,6 @@
 import React from 'react'
-import { Grid } from '@mui/material'
+import { Box } from '@mui/material'
+import Grid from '@mui/material/Unstable_Grid2'
 
 import Widget from './Widget'
 
@@ -8,16 +9,15 @@ type Props = {
 }
 
 export default function WidgetsGrid(props: Props) {
-
     return (
-        <div>
+        <Box sx={{ padding: 3 }}>
             <Grid container spacing={3}>
-                {props.widgets.map(widget => (
-                    <Grid key={widget} item xs>
+                {props.widgets.map((widget) => (
+                    <Grid key={widget}>
                         <Widget name={widget} />
                     </Grid>
                 ))}
             </Grid>
-        </div>
+        </Box>
     )
 }

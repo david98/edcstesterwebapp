@@ -42,20 +42,19 @@ class ApiWrapper {
         }
     }
 
-    getWidgetStatus: (
-        widgetName: string
-    ) => Promise<WidgetStatusResponse> = async (widgetName: string) => {
-        let requestURL = ApiBaseUrl + 'widgets/' + widgetName
-        try {
-            let response = await fetch(requestURL, { mode: 'cors' })
-            let responseJson = await response.json()
+    getWidgetStatus: (widgetName: string) => Promise<WidgetStatusResponse> =
+        async (widgetName: string) => {
+            let requestURL = ApiBaseUrl + 'widgets/' + widgetName
+            try {
+                let response = await fetch(requestURL, { mode: 'cors' })
+                let responseJson = await response.json()
 
-            return responseJson as WidgetStatusResponse
-        } catch (error) {
-            console.log(error)
-            throw error
+                return responseJson as WidgetStatusResponse
+            } catch (error) {
+                console.log(error)
+                throw error
+            }
         }
-    }
 
     setWidgetEnable: (
         widgetName: string,

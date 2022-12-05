@@ -1,54 +1,43 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import TopBar from '../components/TopBar'
 import WidgetsGrid from '../components/WidgetsGrid'
-import { createStyles, makeStyles, Theme, LinearProgress } from '@mui/material'
+import { LinearProgress } from '@mui/material'
 import ApiWrapper from '../utils/ApiWrapper'
 
-type State = {
-    loading: boolean
-    widgets: string[]
-    filteredWidgets: string[]
-}
-
 export default function Home() {
+    const [loading, setLoading] = useState(true)
+    const [widgets, setWidgets] = useState<string[]>([])
+    const [filteredWidgets, setFilteredWidgets] = useState<string[]>([])
 
-    const [state, setState] = React.useState<State>({
-        loading: true,
-        widgets: [],
-        filteredWidgets: [],
-    })
-
-    const filterWidgets = (word: string) =>
-        setState({
-            ...state,
-            filteredWidgets: state.widgets.filter(widget =>
-                widget.toLowerCase().includes(word.toLowerCase())
+    const filterWidgets = useCallback(
+        (word: string) =>
+            setFilteredWidgets(
+                widgets.filter((widget) =>
+                    widget.toLowerCase().includes(word.toLowerCase())
+                )
             ),
-        })
-
-    const loadWidgets = async () => {
-        let widgets = await ApiWrapper.getWidgets()
-        setState({
-            ...state,
-            loading: false,
-            widgets,
-            filteredWidgets: widgets,
-        })
-    }
+        [widgets]
+    )
 
     useEffect(() => {
+        const loadWidgets = async () => {
+            let widgets = await ApiWrapper.getWidgets()
+            await setWidgets(widgets)
+            await setFilteredWidgets(widgets)
+            await setLoading(false)
+        }
         loadWidgets()
-    }, [])
+    }, [setWidgets, setFilteredWidgets, setLoading])
 
     return (
         <div>
             <TopBar onSearchTextChange={filterWidgets} />
             <div>
-                {state.loading ? (
+                {loading ? (
                     <LinearProgress />
                 ) : (
-                    <WidgetsGrid widgets={state.filteredWidgets} />
+                    <WidgetsGrid widgets={filteredWidgets} />
                 )}
             </div>
         </div>
